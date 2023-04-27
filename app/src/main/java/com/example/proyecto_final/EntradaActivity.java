@@ -1,5 +1,6 @@
 package com.example.proyecto_final;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -11,10 +12,17 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class EntradaActivity extends AppCompatActivity {
     private EditText usuari, clave;
     private Button inicio, registro;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +55,32 @@ public class EntradaActivity extends AppCompatActivity {
                 }else if(usuari.getText().toString().equals("admin") && clave.getText().toString().equals("admin")){
                     // Inicia la actividad ChannelActivity
                     startActivity(new Intent(EntradaActivity.this,ChannelActivity.class));
+                }else{// Busca en la BD de Firebase la colección "usuarios" y compara los campos
+                    db.collection("usuarios")
+                            .whereEqualTo("correo", ((EditText)usuari).getText().toString())
+                            .whereEqualTo("clave", ((EditText)clave).getText().toString())
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        // Si la consulta es exitosa y devuelve algún resultado, inicia la actividad ChannelActivity
+                                        if (!task.getResult().isEmpty()) {
+                                            Intent intent = new Intent(EntradaActivity.this, ChannelActivity.class);
+                                            startActivity(intent);
+                                            finish();
+                                        } else {
+                                            // Si la consulta no devuelve resultados, muestra un mensaje de error
+                                            Toast.makeText(EntradaActivity.this, "Usuario o contraseña incorrectos",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    } else {
+                                        // Si la consulta falla, muestra un mensaje de error
+                                        Toast.makeText(EntradaActivity.this, "Error al iniciar sesión",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
                 }
             }
         });// Configura el comportamiento del botón de registro

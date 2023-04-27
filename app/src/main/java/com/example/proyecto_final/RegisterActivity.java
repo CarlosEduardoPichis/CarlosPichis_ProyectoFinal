@@ -12,8 +12,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -43,7 +49,7 @@ public class RegisterActivity extends AppCompatActivity {
     private void iniciarVar(){
         // Inicializar y asignar valores a las variables de la actividad en la que se encuentra
         nombre = findViewById(R.id.editTextNombre);
-        correo = findViewById(R.id.editCorreo);
+        correo = findViewById(R.id.editTextCorreo);
         clave = findViewById(R.id.editTextClave);
         volver = findViewById(R.id.atras);
         guardar = findViewById(R.id.btn_add);
